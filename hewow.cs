@@ -26,6 +26,6 @@ static string Maprint(string map[][]) {
         Console.WriteLine();
     }
 }
-
+    var key = Console.ReadKey(true);
 
 
