@@ -9,14 +9,18 @@ class Program
     {
         map = new string[maple][];
 
+        bool esc = false;
+        int x = 4;
+        int y = 4;
+	Mapa();
+	Read(x, y, esc);	
 
 	}
-		
-	
-	
+			
 	
 	static void Mapa()
 	{
+		map = new string[maple][];
         for (int i = 0; i < maple; i++)
         {
             map[i] = new string[maple];
@@ -25,16 +29,13 @@ class Program
                 map[i][j] = ".";
             }
 		}	
+		}
 		
 		
-		
-		bool esc = false;
-        int x = 6;
-        int y = 0;
-static void read(int x, int y){	
+static void Read(int x, int y, bool esc){	
 	while (true)
 	{
-bool press = false 
+bool press = false; 
 		
 if (esc)
 {
@@ -51,39 +52,34 @@ switch (key.Key)
 
     case ConsoleKey.W:
     case ConsoleKey.UpArrow:
-    x = x-1;
-		press = true
+	if (x != 0){x = x-1;}
+		press = true;
         break;
     case ConsoleKey.S:
     case ConsoleKey.DownArrow:
-	x++;
-		press = true
+	if (x != maple -1){x++;}
+		press = true;
 		break;
     case ConsoleKey.A:
     case ConsoleKey.LeftArrow:
-    y = y-1;
-		press = true
+    if ( y != 0){y = y-1;}
+		press = true;
 		break;
     case ConsoleKey.D:
-    case ConsoleKey.RightArrow:
-	y ++;
-		press = true
+    case ConsoleKey.RightArrow:	
+if (y != maple - 1){y++;}
+		press = true;
         break;
 }
 if (press)
 {
-Player(x, y)
-MapPrint()
+Console.Clear();
+Mapa();
+Player(x, y);
+MapPrint();
 }
-
-	}
-
-    
-    
-
-        Console.ReadKey(true);
-    }
-
+}
+}
     static void Player(int x, int y)
     {
         map[x][y] = "P";
