@@ -9,6 +9,14 @@ class Program
     {
         map = new string[maple][];
 
+
+	}
+		
+	
+	
+	
+	static void Mapa()
+	{
         for (int i = 0; i < maple; i++)
         {
             map[i] = new string[maple];
@@ -16,12 +24,18 @@ class Program
             {
                 map[i][j] = ".";
             }
-        }
-	bool esc = false;
+		}	
+		
+		
+		
+		bool esc = false;
         int x = 6;
         int y = 0;
+static void read(int x, int y){	
 	while (true)
 	{
+bool press = false 
+		
 if (esc)
 {
 	break;
@@ -37,24 +51,35 @@ switch (key.Key)
 
     case ConsoleKey.W:
     case ConsoleKey.UpArrow:
-        Console.WriteLine("Nahoru");
+    x = x-1;
+		press = true
         break;
     case ConsoleKey.S:
     case ConsoleKey.DownArrow:
-        Console.WriteLine("Dolu");
-        break;
+	x++;
+		press = true
+		break;
     case ConsoleKey.A:
     case ConsoleKey.LeftArrow:
-        Console.WriteLine("Leva");
-        break;
+    y = y-1;
+		press = true
+		break;
     case ConsoleKey.D:
     case ConsoleKey.RightArrow:
 	y ++;
+		press = true
         break;
 }
+if (press)
+{
+Player(x, y)
+MapPrint()
+}
+
 	}
-        Player(x, y);
-        MapPrint();
+
+    
+    
 
         Console.ReadKey(true);
     }
