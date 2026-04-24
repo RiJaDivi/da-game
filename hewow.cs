@@ -1,17 +1,22 @@
 using System;
-
+using System.Security.Cryptography;
 class Program
 {
     static int maple = 8;
     static string[][] map;
+public static List<int> kameny = new List<int>{};
+public static List<int> kamenx = new List<int>{};
 
-    static void Main()
+
+static void Main()
     {
         map = new string[maple][];
 
         bool esc = false;
         int x = 4;
         int y = 4;
+	int kamen = 8;
+	Rocks(kamen);
 	Mapa();
 	Read(x, y, esc);	
 
@@ -28,7 +33,8 @@ class Program
             {
                 map[i][j] = ".";
             }
-		}	
+
+		}
 		}
 		
 		
@@ -73,13 +79,13 @@ if (y != maple - 1){y++;}
 }
 if (press)
 {
-Console.Clear();
 Mapa();
+Console.Clear();
 Player(x, y);
 MapPrint();
 }
-}
-}
+ }
+  }
     static void Player(int x, int y)
     {
         map[x][y] = "P";
@@ -87,6 +93,7 @@ MapPrint();
 
     static void MapPrint()
     {
+	Renderock();
         for (int i = 0; i < maple; i++)
         {
             for (int j = 0; j < maple; j++)
@@ -94,6 +101,34 @@ MapPrint();
                 Console.Write(map[i][j] + " ");
             }
             Console.WriteLine();
-        }
+      }
     }
+	static void Rocks(int pocet)
+{
+        for (int i = 0; i < pocet; i++)
+{	
+var rngNum1 = RandomNumberGenerator.GetInt32(maple);
+var rngNum2 = RandomNumberGenerator.GetInt32(maple);
+
+Storock(rngNum1, rngNum2);
+}}
+
+
+static void Renderock(){
+for (int i = 0; i < kameny.Count; i++){
+PutRock(kameny[i], kamenx[i]);
+}
+}
+
+ 
+	static void PutRock(int x, int y)
+{
+map[x][y] = "R";
+}
+
+static void Storock(int rnd1, int rnd2)
+{
+kameny.Add(rnd1);
+kamenx.Add(rnd2);
+}
 }
