@@ -58,22 +58,22 @@ switch (key.Key)
 
     case ConsoleKey.W:
     case ConsoleKey.UpArrow:
-	if (x != 0){x = x-1;}
+	if (x != 0 && Hitrock(x - 1, y)){x = x-1;}
 		press = true;
         break;
     case ConsoleKey.S:
     case ConsoleKey.DownArrow:
-	if (x != maple -1){x++;}
+	if (x != maple -1 && Hitrock(x + 1, y)){x++;}
 		press = true;
 		break;
     case ConsoleKey.A:
     case ConsoleKey.LeftArrow:
-    if ( y != 0){y = y-1;}
+    if ( y != 0 && Hitrock(x, y - 1)){y = y-1;}
 		press = true;
 		break;
     case ConsoleKey.D:
     case ConsoleKey.RightArrow:	
-if (y != maple - 1){y++;}
+if (y != maple - 1 && Hitrock(x, y + 1)){y++;}
 		press = true;
         break;
 }
@@ -113,10 +113,9 @@ var rngNum2 = RandomNumberGenerator.GetInt32(maple);
 Storock(rngNum1, rngNum2);
 }}
 
-
 static void Renderock(){
 for (int i = 0; i < kameny.Count; i++){
-PutRock(kameny[i], kamenx[i]);
+PutRock(kamenx[i], kameny[i]);
 }
 }
 
@@ -130,5 +129,15 @@ static void Storock(int rnd1, int rnd2)
 {
 kameny.Add(rnd1);
 kamenx.Add(rnd2);
+}
+static bool Hitrock(int x, int y)
+{
+for (int i = 0; i < kameny.Count; i++){
+if (kameny[i] == y && kamenx[i] == x){
+return false;
+}
+
+}
+return true;
 }
 }
