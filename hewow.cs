@@ -11,7 +11,7 @@ public static List<int> kamenx = new List<int>{};
 static void Main()
     {
         map = new string[maple][];
-
+	startposx = 4
         bool esc = false;
         int x = 4;
         int y = 4;
@@ -109,7 +109,9 @@ MapPrint();
 {	
 var rngNum1 = RandomNumberGenerator.GetInt32(maple);
 var rngNum2 = RandomNumberGenerator.GetInt32(maple);
-
+if (rngNum1 == maple // 2 && rngNum2 == maple // 2){
+skip;
+}
 Storock(rngNum1, rngNum2);
 }}
 
@@ -140,4 +142,41 @@ return false;
 }
 return true;
 }
+
+public class Monsters{
+public int Zivot;
+public int Utok;
+public char Skin;
+public Monsters(int zivot, int utok, char skin){
+Zivot = zivot;
+Utok = utok;
+Skin = skin;
+}
+public abstract void Move(){
+}
+}
+public class Goblin : Monsters{
+pubic Goblin(int zivot, int utok) : base(zivot, utok, 'G'){
+
+}
+}
+
+
+public class Slime : Monsters{
+public int Velikost;
+public Slime(int zivot, int utok, int velikost) : base(zivot, utok, 'S'){
+Velikost = velikost;
+Skin = 'S';
+}
+}
+public class Zombie : Monsters{
+bool Reborn;
+
+public Zombie(int zivot, int utok) : base(zivot, utok, 'Z')
+{
+Reborn = true;
+
+}
+}
+
 }
