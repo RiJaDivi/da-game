@@ -3,22 +3,21 @@ using System.Security.Cryptography;
 class Program
 {
     static int maple = 8;
-    static string[][] map;
+    static string[][] map = null;
 public static List<int> kameny = new List<int>{};
 public static List<int> kamenx = new List<int>{};
-
-
+public static int x = 4;
+public static int y = 4;
+public static int startposx;
 static void Main()
     {
         map = new string[maple][];
-	startposx = 4
         bool esc = false;
-        int x = 4;
-        int y = 4;
+        
 	int kamen = 8;
 	Rocks(kamen);
 	Mapa();
-	Read(x, y, esc);	
+	Read(esc);	
 
 	}
 			
@@ -38,7 +37,7 @@ static void Main()
 		}
 		
 		
-static void Read(int x, int y, bool esc){	
+static void Read(bool esc){	
 	while (true)
 	{
 bool press = false; 
@@ -52,7 +51,7 @@ switch (key.Key)
 {
 	
     case ConsoleKey.Escape:
-	Console.WriteLine("Končím");
+	Console.WriteLine(" končím");
 	esc = true;
         break;
 
@@ -81,12 +80,12 @@ if (press)
 {
 Mapa();
 Console.Clear();
-Player(x, y);
+Player();
 MapPrint();
 }
  }
   }
-    static void Player(int x, int y)
+    static void Player()
     {
         map[x][y] = "P";
     }
@@ -109,22 +108,22 @@ MapPrint();
 {	
 var rngNum1 = RandomNumberGenerator.GetInt32(maple);
 var rngNum2 = RandomNumberGenerator.GetInt32(maple);
-if (rngNum1 == maple // 2 && rngNum2 == maple // 2){
-skip;
+if (rngNum1 == startposx && rngNum2 == startposx){
+continue;
 }
 Storock(rngNum1, rngNum2);
 }}
 
 static void Renderock(){
 for (int i = 0; i < kameny.Count; i++){
-PutRock(kamenx[i], kameny[i]);
+PuThing(kamenx[i], kameny[i], "R");
 }
 }
 
  
-	static void PutRock(int x, int y)
+	static void PuThing(int m, int n, string R)
 {
-map[x][y] = "R";
+map[m][n] = R;
 }
 
 static void Storock(int rnd1, int rnd2)
@@ -132,10 +131,10 @@ static void Storock(int rnd1, int rnd2)
 kameny.Add(rnd1);
 kamenx.Add(rnd2);
 }
-static bool Hitrock(int x, int y)
+static bool Hitrock(int m, int n)
 {
 for (int i = 0; i < kameny.Count; i++){
-if (kameny[i] == y && kamenx[i] == x){
+if (kameny[i] == n && kamenx[i] == m){
 return false;
 }
 
@@ -143,40 +142,81 @@ return false;
 return true;
 }
 
-public class Monsters{
+public abstract class Monsters{
 public int Zivot;
 public int Utok;
 public char Skin;
-public Monsters(int zivot, int utok, char skin){
+public int Posx;
+public int Posy;
+public Monsters(int zivot, int utok, char skin, int posx, int posy){
 Zivot = zivot;
 Utok = utok;
 Skin = skin;
+Posx = posx;
+Posy = posy;
 }
-public abstract void Move(){
-}
+public abstract void Move();
+
 }
 public class Goblin : Monsters{
-pubic Goblin(int zivot, int utok) : base(zivot, utok, 'G'){
-
+public Goblin(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'G', posx, posy){}
+public override void Move()
+	{
+	SimpleMove(ref Posx, ref Posy);
+	}
 }
-}
 
 
-public class Slime : Monsters{
+public class Slime : Monsters
+{
 public int Velikost;
-public Slime(int zivot, int utok, int velikost) : base(zivot, utok, 'S'){
+public Slime(int zivot, int utok, int velikost, int posx, int posy) : base(zivot, utok, 'S', posx, posy)
+	{
 Velikost = velikost;
 Skin = 'S';
-}
+	}
+public override void Move()
+	{
+SimpleMove(ref Posx, ref Posy);
+	}
 }
 public class Zombie : Monsters{
 bool Reborn;
 
-public Zombie(int zivot, int utok) : base(zivot, utok, 'Z')
+public Zombie(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'Z', posx, posy)
 {
 Reborn = true;
+}
+public override void Move(){
+SimpleMove(ref Posx,ref Posy );
 
 }
+}
+
+static void SimpleMove(ref int Posx, ref int Posy){
+if (Math.Abs(x - Posx) > Math.Abs(y - Posy)){
+	if (x - Posx > 0)
+	{
+	Posx ++;
+	}
+	else
+	{
+	Posx --;
+	}
+}
+else{
+        if (y - Posy > 0) 
+        {
+        Posy ++;
+        }
+        else 
+        { 
+        Posy --;
+        }
+
+
+}
+
 }
 
 }
