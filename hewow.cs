@@ -3,34 +3,37 @@ using System.Security.Cryptography;
 class Program
 {
     static int maple = 8;
-    static string[][] map = null;
+    static char[][] map;
 public static List<int> kameny = new List<int>{};
 public static List<int> kamenx = new List<int>{};
 public static int x = 4;
 public static int y = 4;
 public static int startposx;
+public static List<Monsters> monsters = new List<Monsters>();
+
 static void Main()
     {
-        map = new string[maple][];
+		
+        map = new char[maple][];
         bool esc = false;
-        
 	int kamen = 8;
-	Rocks(kamen);
 	Mapa();
-	Read(esc);	
-
+	Rocks(kamen);
+	MonsterCreate(3);
+	Read(esc);
+	MonsteRead();	
 	}
 			
 	
 	static void Mapa()
 	{
-		map = new string[maple][];
+		map = new char[maple][];
         for (int i = 0; i < maple; i++)
         {
-            map[i] = new string[maple];
+            map[i] = new char[maple];
             for (int j = 0; j < maple; j++)
             {
-                map[i][j] = ".";
+                map[i][j] = '.';
             }
 
 		}
@@ -87,12 +90,13 @@ MapPrint();
   }
     static void Player()
     {
-        map[x][y] = "P";
+        map[x][y] = 'P';
     }
 
     static void MapPrint()
     {
 	Renderock();
+	MonsteRender();
         for (int i = 0; i < maple; i++)
         {
             for (int j = 0; j < maple; j++)
@@ -116,12 +120,12 @@ Storock(rngNum1, rngNum2);
 
 static void Renderock(){
 for (int i = 0; i < kameny.Count; i++){
-PuThing(kamenx[i], kameny[i], "R");
+PuThing(kamenx[i], kameny[i], 'R');
 }
 }
 
  
-	static void PuThing(int m, int n, string R)
+static void PuThing(int m, int n, char R)
 {
 map[m][n] = R;
 }
@@ -213,10 +217,67 @@ else{
         { 
         Posy --;
         }
-
-
-}
+    }
 
 }
+static void MonsterCreate(int poc){
+for (int i = 0; i < poc; i++)
+ {
+   var (posx, posy) = Moncontr();
+   var rngNum1 = RandomNumberGenerator.GetInt32(3);
+   if (posx == -1){break;}
+    switch(rngNum1){
+		case 0:
+			monsters.Add(new Goblin(1, 2, posx, posy));
+			break;
+		case 1:
+                        monsters.Add(new Zombie(2, 1, posx, posy));
+                        break;
+		case 2:
+			monsters.Add(new Slime(2, 1, 2, posx, posy));
+			break;
+	   }
+ }
+				 }
+static int Randomize(){
+int r = RandomNumberGenerator.GetInt32(6); // 0–5
 
+if (r > 2)
+{
+r += 2;
+}
+return r;
+			}
+static (int posx, int posy) Moncontr(){
+for(int i = 0; i < maple * maple; i++){
+int posx = Randomize();
+int posy = Randomize();
+if (Hitrock(posx, posy) && MonFul(posx, posy))
+{return (posx, posy);
+}
+		   }
+Console.WriteLine("Nebude plný počet nepřátel");
+return (-1, -1);
+		    			}
+static void MonsteRead(){
+foreach (var m in monsters){
+    Console.WriteLine($"HP: {m.Zivot}, ATK: {m.Utok}, X: {m.Posx}, Y: {m.Posy}");
+			   }			
+			}
+static bool MonFul(int m, int n){
+foreach (var i in monsters){
+ if(i.Posx == m && i.Posy == n){
+	return false;
+				}
+			}
+return true;
+				}
+			
+static void MonsteRender()
+{
+foreach (var m in monsters){
+if (m == null) {continue;}
+PuThing(m.Posx, m.Posy, m.Skin);
+			}
+		       }
 }
