@@ -8,8 +8,15 @@ public static List<int> kameny = new List<int>{};
 public static List<int> kamenx = new List<int>{};
 public static int x = 4;
 public static int y = 4;
+public static int zivot = 3;
 public static int startposx;
+public static int PlaUtok = 1;
+public static int monSl = 0;
+public static int lvl = 1;
+public static double modifi = 0.5;
+public static bool konec = false;
 public static List<Monsters> monsters = new List<Monsters>();
+
 
 static void Main()
     {
@@ -21,7 +28,9 @@ static void Main()
 	Rocks(kamen);
 	MonsterCreate(3);
 	Read(esc);
-	MonsteRead();	
+	if (konec){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátele");};
+	if (LevelUp()) {Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
+	
 	}
 			
 	
@@ -60,22 +69,26 @@ switch (key.Key)
 
     case ConsoleKey.W:
     case ConsoleKey.UpArrow:
-	if (x != 0 && Hitrock(x - 1, y)){x = x-1;}
+	if (x != 0 && MR(x - 1, y)){x = x-1;}
+	else if (!MonFul(x - 1, y)){Utok(x - 1, y);}
 		press = true;
         break;
     case ConsoleKey.S:
     case ConsoleKey.DownArrow:
-	if (x != maple -1 && Hitrock(x + 1, y)){x++;}
+	if (x != maple -1 && MR(x + 1, y)){x++;}
+	else if (!MonFul(x + 1, y)){Utok(x + 1, y);}
 		press = true;
 		break;
     case ConsoleKey.A:
     case ConsoleKey.LeftArrow:
-    if ( y != 0 && Hitrock(x, y - 1)){y = y-1;}
+    if ( y != 0 && MR(x, y - 1)){y = y-1;}
+	else if (!MonFul(x, y - 1)){Utok(x, y - 1);}
 		press = true;
 		break;
     case ConsoleKey.D:
     case ConsoleKey.RightArrow:	
-if (y != maple - 1 && Hitrock(x, y + 1)){y++;}
+if (y != maple - 1 && MR(x, y + 1)){y++;}
+else  if (!MonFul(x, y + 1)){Utok(x, y + 1);}
 		press = true;
         break;
 }
@@ -84,7 +97,13 @@ if (press)
 Mapa();
 Console.Clear();
 Player();
+MonsterMovin();
 MapPrint();
+ZUkaz();
+PlayEnd();
+if (konec || LevelUp()){
+break;
+	   }
 }
  }
   }
@@ -152,12 +171,14 @@ public int Utok;
 public char Skin;
 public int Posx;
 public int Posy;
+public bool Stoned;
 public Monsters(int zivot, int utok, char skin, int posx, int posy){
 Zivot = zivot;
 Utok = utok;
 Skin = skin;
 Posx = posx;
 Posy = posy;
+Stoned = false;
 }
 public abstract void Move();
 
@@ -166,7 +187,7 @@ public class Goblin : Monsters{
 public Goblin(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'G', posx, posy){}
 public override void Move()
 	{
-	SimpleMove(ref Posx, ref Posy);
+	SimpleMove(ref Posx, ref Posy, Utok);
 	}
 }
 
@@ -181,7 +202,7 @@ Skin = 'S';
 	}
 public override void Move()
 	{
-SimpleMove(ref Posx, ref Posy);
+SimpleMove(ref Posx, ref Posy, Utok);
 	}
 }
 public class Zombie : Monsters{
@@ -192,33 +213,57 @@ public Zombie(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'Z', 
 Reborn = true;
 }
 public override void Move(){
-SimpleMove(ref Posx,ref Posy );
+SimpleMove(ref Posx,ref Posy, Utok);
 
 }
 }
 
-static void SimpleMove(ref int Posx, ref int Posy){
+static void SimpleMove(ref int Posx, ref int Posy, int atk){
 if (Math.Abs(x - Posx) > Math.Abs(y - Posy)){
 	if (x - Posx > 0)
 	{
+	if (MR(Posx + 1, Posy) && PlayHere(Posx + 1, Posy))
+	{
 	Posx ++;
 	}
+	else if (!PlayHere(Posx + 1, Posy)){
+		zivot = zivot - atk;
+		}
+	}
 	else
-	{
+	{ if (MR(Posx - 1, Posy) && PlayHere(Posx - 1, Posy))
+	{ 
+	
 	Posx --;
 	}
-}
+	else if (!PlayHere(Posx - 1, Posy))
+		{
+		zivot = zivot - atk;
+		}
+	}
+						}
 else{
         if (y - Posy > 0) 
         {
-        Posy ++;
+	if (MR(Posx, Posy + 1) && PlayHere(Posx, Posy + 1)) {
+        Posy ++;}
+	else if (!PlayHere(Posx, Posy + 1))
+		{
+		zivot = zivot - atk;
+		}
         }
         else 
-        { 
+	{if (MR(Posx, Posy - 1) && PlayHere(Posx, Posy - 1))
+        {
         Posy --;
         }
+	else if (!PlayHere(Posx, Posy - 1))
+		{
+		zivot = zivot - atk;
+		}
+	}
     }
-
+	
 }
 static void MonsterCreate(int poc){
 for (int i = 0; i < poc; i++)
@@ -228,15 +273,15 @@ for (int i = 0; i < poc; i++)
    if (posx == -1){break;}
     switch(rngNum1){
 		case 0:
-			monsters.Add(new Goblin(1, 2, posx, posy));
+			monsters.Add(new Goblin((int)Math.Round(2 * modifi), 2, posx, posy));
 			break;
 		case 1:
-                        monsters.Add(new Zombie(2, 1, posx, posy));
+                        monsters.Add(new Zombie((int)Math.Round(3 * modifi), 1, posx, posy));
                         break;
 		case 2:
-			monsters.Add(new Slime(2, 1, 2, posx, posy));
+			monsters.Add(new Slime((int)Math.Round(6 * modifi), 1, 2, posx, posy));
 			break;
-	   }
+	   	   }
  }
 				 }
 static int Randomize(){
@@ -255,7 +300,7 @@ int posy = Randomize();
 if (Hitrock(posx, posy) && MonFul(posx, posy))
 {return (posx, posy);
 }
-		   }
+}
 Console.WriteLine("Nebude plný počet nepřátel");
 return (-1, -1);
 		    			}
@@ -276,8 +321,107 @@ return true;
 static void MonsteRender()
 {
 foreach (var m in monsters){
+
 if (m == null) {continue;}
 PuThing(m.Posx, m.Posy, m.Skin);
 			}
 		       }
+static void MonsterMovin(){
+foreach (var m in monsters){
+
+if (!m.Stoned && m != null){
+m.Move();
+			    }
+else {
+m.Stoned = false;
+      }
+
+			   }				
+			  }
+static bool PlayHere(int posx, int posy){
+if (posx == x && posy == y){
+return false;
+}
+else{
+return true;
+}
+}
+
+static bool MR(int posx, int posy)
+{
+if (Hitrock(posx, posy) && MonFul(posx, posy))
+{
+return true;
+}
+else
+{
+return false;
+}
+}
+
+static void ZUkaz()
+{
+Console.WriteLine("                  ");
+for (int i = 0; i < zivot; i++)
+{
+Console.Write(" o");
+}
+Console.WriteLine("");
+Console.WriteLine($"                  {monSl}");
+}
+
+static void Utok(int posx,int posy)
+{
+foreach(var m in monsters){
+if ((posx, posy) == (m.Posx, m.Posy)){
+m.Zivot = m.Zivot - PlaUtok;
+if (posx != x) {
+		if (x > posx && MR(posx - 1, posy) && posx - 1 >= 0){		
+			m.Posx --;
+		    	     }
+		else if (MR(posx + 1, posy) && posx + 1 < maple){
+		m.Posx ++;
+		     }
+		}
+else{
+                if (y > posy && MR(posx, posy - 1) && posy >= 0){
+		m.Posy --;
+		}
+                else if(MR(posx, posy + 1) && posy < maple){ 
+                m.Posy ++;
+                }
+     }
+m.Stoned = true;
+				     }
+			  }
+Check();
+}
+static void Check(){
+for (int i = monsters.Count - 1; i >= 0; i--)
+{
+    if (monsters[i].Zivot <= 0)
+    {
+	PuThing(monsters[i].Posx, monsters[i].Posy, '.');
+        monsters.RemoveAt(i);
+	monSl ++;	
+    }
+}	
+		    }
+static void PlayEnd()
+{
+if (zivot < 1){
+konec = true;
+	       }
+}
+static bool LevelUp(){
+if (monsters.Count == 0)
+{
+lvl ++;
+return true;
+}
+else 
+{
+return false;
+}
+		      }
 }
