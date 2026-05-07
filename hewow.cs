@@ -13,14 +13,15 @@ public static int startposx;
 public static int PlaUtok = 1;
 public static int monSl = 0;
 public static int lvl = 1;
-public static double modifi = 0.5;
+public static double modifi = 1;
 public static bool konec = false;
 public static List<Monsters> monsters = new List<Monsters>();
 
 
 static void Main()
     {
-		
+	AskRole();
+	Console.Clear();
         map = new char[maple][];
         bool esc = false;
 	int kamen = 8;
@@ -217,7 +218,49 @@ SimpleMove(ref Posx,ref Posy, Utok);
 
 }
 }
-
+enum Role{
+Berserk,
+Knight,
+Warior
+}
+static void SetRole(Role role)
+{
+switch(role){
+	case Role.Berserk:
+		PlaUtok = 3;
+		zivot = 2;
+		break;
+	case Role.Knight:
+		PlaUtok = 1;
+		zivot = 5;
+		break;
+	case Role.Warior:
+		PlaUtok = 2;
+		zivot = 3;
+		break;
+	  }
+}
+static void AskRole()
+{
+Console.WriteLine("Vyber si za koho chceš bojovat stiskem čísel");
+Console.WriteLine(" 1 : Berserk				2 : Knight			3 : Warior");
+var key = Console.ReadKey(false);
+switch(key.KeyChar)
+{
+	case '1':
+	case '+':
+	SetRole(Role.Berserk);
+	break;
+	case '2':
+	case 'ě':
+        SetRole(Role.Knight);
+        break;
+	case '3':
+	case 'č':
+	SetRole(Role.Warior);
+	break;
+}
+}
 static void SimpleMove(ref int Posx, ref int Posy, int atk){
 if (Math.Abs(x - Posx) > Math.Abs(y - Posy)){
 	if (x - Posx > 0)
