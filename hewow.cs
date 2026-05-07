@@ -14,6 +14,7 @@ public static int PlaUtok = 1;
 public static int monSl = 0;
 public static int lvl = 1;
 public static double modifi = 1;
+public static bool weagiver = false;
 public static bool konec = false;
 public static List<Monsters> monsters = new List<Monsters>();
 
@@ -173,6 +174,7 @@ public char Skin;
 public int Posx;
 public int Posy;
 public bool Stoned;
+public bool Weaknes;
 public Monsters(int zivot, int utok, char skin, int posx, int posy){
 Zivot = zivot;
 Utok = utok;
@@ -180,6 +182,7 @@ Skin = skin;
 Posx = posx;
 Posy = posy;
 Stoned = false;
+Weaknes = false;
 }
 public abstract void Move();
 
@@ -188,7 +191,7 @@ public class Goblin : Monsters{
 public Goblin(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'G', posx, posy){}
 public override void Move()
 	{
-	SimpleMove(ref Posx, ref Posy, Utok);
+	SimpleMove(ref Posx, ref Posy, Utok, ref Weaknes);
 	}
 }
 
@@ -203,7 +206,7 @@ Skin = 'S';
 	}
 public override void Move()
 	{
-SimpleMove(ref Posx, ref Posy, Utok);
+SimpleMove(ref Posx, ref Posy, Utok, ref Weaknes);
 	}
 }
 public class Zombie : Monsters{
@@ -214,7 +217,7 @@ public Zombie(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'Z', 
 Reborn = true;
 }
 public override void Move(){
-SimpleMove(ref Posx,ref Posy, Utok);
+SimpleMove(ref Posx,ref Posy, Utok, ref Weaknes);
 
 }
 }
@@ -233,6 +236,7 @@ switch(role){
 	case Role.Knight:
 		PlaUtok = 1;
 		zivot = 5;
+		weagiver = true;
 		break;
 	case Role.Warior:
 		PlaUtok = 2;
@@ -261,7 +265,7 @@ switch(key.KeyChar)
 	break;
 }
 }
-static void SimpleMove(ref int Posx, ref int Posy, int atk){
+static void SimpleMove(ref int Posx, ref int Posy, int atk, ref bool weak){
 if (Math.Abs(x - Posx) > Math.Abs(y - Posy)){
 	if (x - Posx > 0)
 	{
@@ -281,7 +285,12 @@ if (Math.Abs(x - Posx) > Math.Abs(y - Posy)){
 	}
 	else if (!PlayHere(Posx - 1, Posy))
 		{
+		if (weak){
+			zivot = zivot - (int)(Math.Round(atk * 0.5));
+			}
+		else{
 		zivot = zivot - atk;
+		     }
 		}
 	}
 						}
@@ -418,6 +427,8 @@ static void Utok(int posx,int posy)
 foreach(var m in monsters){
 if ((posx, posy) == (m.Posx, m.Posy)){
 m.Zivot = m.Zivot - PlaUtok;
+if (weagiver){m.Weaknes = true; m.Skin = char.ToLower(m.Skin);}
+
 if (posx != x) {
 		if (x > posx && MR(posx - 1, posy) && posx - 1 >= 0){		
 			m.Posx --;
