@@ -21,6 +21,7 @@ public static List<Monsters> monsters = new List<Monsters>();
 
 static void Main()
     {
+	Console.Clear();
 	AskRole();
 	Console.Clear();
         map = new char[maple][];
@@ -173,7 +174,7 @@ public int Utok;
 public char Skin;
 public int Posx;
 public int Posy;
-public bool Stoned;
+public int Stoned;
 public bool Weaknes;
 public Monsters(int zivot, int utok, char skin, int posx, int posy){
 Zivot = zivot;
@@ -181,7 +182,7 @@ Utok = utok;
 Skin = skin;
 Posx = posx;
 Posy = posy;
-Stoned = false;
+Stoned = 0;
 Weaknes = false;
 }
 public abstract void Move();
@@ -210,7 +211,7 @@ SimpleMove(ref Posx, ref Posy, Utok, ref Weaknes);
 	}
 }
 public class Zombie : Monsters{
-bool Reborn;
+public bool Reborn;
 
 public Zombie(int zivot, int utok, int posx, int posy) : base(zivot, utok, 'Z', posx, posy)
 {
@@ -325,13 +326,13 @@ for (int i = 0; i < poc; i++)
    if (posx == -1){break;}
     switch(rngNum1){
 		case 0:
-			monsters.Add(new Goblin((int)Math.Round(2 * modifi), 2, posx, posy));
+			monsters.Add(new Goblin((int)Math.Round(2 * modifi), (int)Math.Round(2 * modifi), posx, posy));
 			break;
 		case 1:
-                        monsters.Add(new Zombie((int)Math.Round(3 * modifi), 1, posx, posy));
+                        monsters.Add(new Zombie((int)Math.Round(3 * modifi), (int)Math.Round(1 * modifi), posx, posy));
                         break;
 		case 2:
-			monsters.Add(new Slime((int)Math.Round(6 * modifi), 1, 2, posx, posy));
+			monsters.Add(new Slime((int)Math.Round(6 * modifi), (int)Math.Round(1 * modifi), 2, posx, posy));
 			break;
 	   	   }
  }
@@ -380,14 +381,13 @@ PuThing(m.Posx, m.Posy, m.Skin);
 		       }
 static void MonsterMovin(){
 foreach (var m in monsters){
-
-if (!m.Stoned && m != null){
+ZombiePr(m);
+if (m.Stoned == 0){
 m.Move();
 			    }
 else {
-m.Stoned = false;
+m.Stoned --;
       }
-
 			   }				
 			  }
 static bool PlayHere(int posx, int posy){
@@ -428,24 +428,23 @@ foreach(var m in monsters){
 if ((posx, posy) == (m.Posx, m.Posy)){
 m.Zivot = m.Zivot - PlaUtok;
 if (weagiver){m.Weaknes = true; m.Skin = char.ToLower(m.Skin);}
-
+m.Stoned = 1;
 if (posx != x) {
 		if (x > posx && MR(posx - 1, posy) && posx - 1 >= 0){		
 			m.Posx --;
 		    	     }
-		else if (MR(posx + 1, posy) && posx + 1 < maple){
+		else if (MR(posx + 1, posy) && MR(posx - 1, posy) && posx + 1 < maple){
 		m.Posx ++;
 		     }
 		}
 else{
-                if (y > posy && MR(posx, posy - 1) && posy >= 0){
+                if (y > posy && MR(posx, posy - 1) && posy - 1 >= 0){
 		m.Posy --;
 		}
-                else if(MR(posx, posy + 1) && posy < maple){ 
+                else if(MR(posx, posy + 1)&& MR(posx, posy - 1) && posy + 1 < maple){ 
                 m.Posy ++;
                 }
      }
-m.Stoned = true;
 				     }
 			  }
 Check();
@@ -453,11 +452,23 @@ Check();
 static void Check(){
 for (int i = monsters.Count - 1; i >= 0; i--)
 {
+
     if (monsters[i].Zivot <= 0)
     {
-	PuThing(monsters[i].Posx, monsters[i].Posy, '.');
+
+	if (monsters[i] is Zombie z){
+	if (z.Reborn){ 
+	z.Stoned = 3;
+        z.Skin = 'c';
+        z.Weaknes = false;
+        z.Reborn = false;
+	z.Zivot = (int)Math.Round(3 * modifi);
+	continue;
+			}
+			}
+        PuThing(monsters[i].Posx, monsters[i].Posy, '.');
         monsters.RemoveAt(i);
-	monSl ++;	
+        monSl ++;
     }
 }	
 		    }
@@ -478,4 +489,10 @@ else
 return false;
 }
 		      }
+static void ZombiePr(Monsters m){
+if (m is Zombie z && !z.Reborn && z.Stoned == 0){
+        m.Skin = m.Weaknes ? 'z' : 'Z';
+			       }
+		    		}
+
 }
