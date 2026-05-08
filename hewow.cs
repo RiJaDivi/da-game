@@ -14,6 +14,7 @@ public static int PlaUtok = 1;
 public static int monSl = 0;
 public static int lvl = 1;
 public static int stoner = 1;
+public static int ability;
 public static double modifi = 1;
 public static bool weagiver = false;
 public static bool konec = false;
@@ -24,17 +25,10 @@ static void Main()
     {
 	Console.Clear();
 	AskRole();
-	Console.Clear();
-        map = new char[maple][];
-        bool esc = false;
-	int kamen = 8;
-	Mapa();
-	Rocks(kamen);
-	MonsterCreate(3);
-	Read(esc);
-	if (konec){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátele");};
-	if (LevelUp()) {Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
-	
+	for (int i = 0; i < 3; i++){
+	Compli();	
+	if (konec){break;}
+	}
 	}
 			
 	
@@ -95,10 +89,13 @@ if (y != maple - 1 && MR(x, y + 1)){y++;}
 else  if (!MonFul(x, y + 1)){Utok(x, y + 1);}
 		press = true;
         break;
+    case ConsoleKey.E:
+	Power();
+	press = true;
+	break;
      case ConsoleKey.Spacebar:
 	press = true;
 	break;
-
 }
 if (press)
 {
@@ -133,8 +130,10 @@ break;
             Console.WriteLine();
       }
     }
-	static void Rocks(int pocet)
+static void Rocks(int pocet)
 {
+	kamenx = new List<int>();
+	kameny = new List<int>();
         for (int i = 0; i < pocet; i++)
 {	
 var rngNum1 = RandomNumberGenerator.GetInt32(maple);
@@ -241,16 +240,20 @@ switch(role){
 		PlaUtok = 3;
 		zivot = 2;
 		stoner = 2;
+		ability = 1;
 		break;
 	case Role.Knight:
 		PlaUtok = 1;
 		zivot = 5;
 		weagiver = true;
+		ability = 2;
 		break;
 	case Role.Warior:
 		PlaUtok = 2;
 		zivot = 3;
+		ability = 3;
 		break;
+
 	  }
 }
 static void AskRole()
@@ -427,7 +430,7 @@ for (int i = 0; i < zivot; i++)
 Console.Write(" o");
 }
 Console.WriteLine("");
-Console.WriteLine($"                  {monSl}");
+Console.WriteLine($"Aktuální lvl: {lvl}                  {monSl}");
 }
 
 static void Utok(int posx,int posy)
@@ -527,6 +530,49 @@ static (int posx,int posy) SlimeTrics(Monsters s){
                 if (MR(s.Posx - 1, s.Posy) && PlayHere(s.Posx - 1, s.Posy)){return (s.Posx - 1, s.Posy);}
 		return (-1, -1);
 	  }
+static void Power()
+{
+switch(ability){
+	case 1:
+	BlowUp();	
+	break;
+	case 2:
+
+	break;
+	case 3:
+	
+	break;
+		}
+}
+
+static void BlowUp(){
+Utok(x + 1, y);
+Utok(x - 1, y);
+Utok(x, y + 1);
+Utok(x, y - 1);
+			}
+
+
+static void Compli()
+{
+        Console.Clear();   
+        map = new char[maple][];
+        bool esc = false;
+        int kamen = 8;
+        Mapa();
+	x = 4;
+	y = 4;
+        Rocks(kamen);
+        MonsterCreate(3);
+	Player();
+	MapPrint();
+	ZUkaz();
+        Read(esc);
+        if (konec && monSl > 1 && monSl < 5){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátele");}
+        else if (konec && monSl >= 5){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátel");}
+	else if (konec && monSl <= 1){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřítele");}
+	if (LevelUp()) {Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
+}
 
 
 }
