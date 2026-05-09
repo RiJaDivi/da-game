@@ -15,9 +15,12 @@ public static int monSl = 0;
 public static int lvl = 1;
 public static int stoner = 1;
 public static int ability;
+public static int block = 0;
+public static int charge = 0;
 public static double modifi = 1;
 public static bool weagiver = false;
 public static bool konec = false;
+public static bool esc = false;
 public static List<Monsters> monsters = new List<Monsters>();
 
 
@@ -27,7 +30,7 @@ static void Main()
 	AskRole();
 	for (int i = 0; i < 3; i++){
 	Compli();	
-	if (konec){break;}
+	if (konec || esc){break;}
 	}
 	}
 			
@@ -47,7 +50,7 @@ static void Main()
 		}
 		
 		
-static void Read(bool esc){	
+static void Read(){	
 	while (true)
 	{
 bool press = false; 
@@ -90,8 +93,11 @@ else  if (!MonFul(x, y + 1)){Utok(x, y + 1);}
 		press = true;
         break;
     case ConsoleKey.E:
+	if (charge == 2){
 	Power();
 	press = true;
+	charge = 0;
+	}
 	break;
      case ConsoleKey.Spacebar:
 	press = true;
@@ -286,24 +292,21 @@ if (Math.Abs(x - Posx) > Math.Abs(y - Posy)){
 	Posx ++;
 	}
 	else if (!PlayHere(Posx + 1, Posy)){
-		zivot = zivot - atk;
-		}
+		GetIn(atk, weak);
+		
 	}
-	else
+	}
+	
+	else if (x - Posx < 0)
 	{ if (MR(Posx - 1, Posy) && PlayHere(Posx - 1, Posy))
 	{ 
-	
 	Posx --;
 	}
 	else if (!PlayHere(Posx - 1, Posy))
 		{
-		if (weak){
-			zivot = zivot - (int)(Math.Round(atk * 0.5));
-			}
-		else{
-		zivot = zivot - atk;
-		     }
-		}
+		GetIn(atk, weak);
+		}		     
+	
 	}
 						}
 else{
@@ -313,17 +316,17 @@ else{
         Posy ++;}
 	else if (!PlayHere(Posx, Posy + 1))
 		{
-		zivot = zivot - atk;
+		GetIn(atk, weak);
 		}
         }
-        else 
+        else if (y - Posy < 0)
 	{if (MR(Posx, Posy - 1) && PlayHere(Posx, Posy - 1))
         {
         Posy --;
         }
 	else if (!PlayHere(Posx, Posy - 1))
 		{
-		zivot = zivot - atk;
+		GetIn(atk, weak);
 		}
 	}
     }
@@ -431,6 +434,10 @@ Console.Write(" o");
 }
 Console.WriteLine("");
 Console.WriteLine($"Aktuální lvl: {lvl}                  {monSl}");
+if (charge == 2)
+{Console.WriteLine("	Můžeš použít ability (e)");}
+
+
 }
 
 static void Utok(int posx,int posy)
@@ -483,6 +490,9 @@ for (int i = monsters.Count - 1; i >= 0; i--)
 	PuThing(monsters[i].Posx, monsters[i].Posy, '.');
         monsters.RemoveAt(i);
         monSl ++;
+	if (charge != 2){
+	charge ++;
+			}
     }
 }	
 		    }
@@ -495,7 +505,6 @@ konec = true;
 static bool LevelUp(){
 if (monsters.Count == 0)
 {
-lvl ++;
 return true;
 }
 else 
@@ -524,10 +533,10 @@ monsters.Add(new Slime((int)Math.Round(3 * Math.Pow(2, s.Velikost - 2) * modifi)
 
 
 static (int posx,int posy) SlimeTrics(Monsters s){
-		if (MR(s.Posx, s.Posy + 1) && PlayHere(s.Posx, s.Posy + 1)){return (s.Posx, s.Posy + 1);}
-                if (MR(s.Posx, s.Posy - 1) && PlayHere(s.Posx, s.Posy - 1)){return (s.Posx, s.Posy - 1);}
-                if (MR(s.Posx + 1, s.Posy) && PlayHere(s.Posx + 1, s.Posy)){return (s.Posx + 1, s.Posy);}
-                if (MR(s.Posx - 1, s.Posy) && PlayHere(s.Posx - 1, s.Posy)){return (s.Posx - 1, s.Posy);}
+		if (MR(s.Posx, s.Posy + 1) && PlayHere(s.Posx, s.Posy + 1) && s.Posy < maple){return (s.Posx, s.Posy + 1);}
+                if (MR(s.Posx, s.Posy - 1) && PlayHere(s.Posx, s.Posy - 1) && s.Posy > 0){return (s.Posx, s.Posy - 1);}
+                if (MR(s.Posx + 1, s.Posy) && PlayHere(s.Posx + 1, s.Posy) && s.Posx < maple){return (s.Posx + 1, s.Posy);}
+                if (MR(s.Posx - 1, s.Posy) && PlayHere(s.Posx - 1, s.Posy) && s.Posx > 0){return (s.Posx - 1, s.Posy);}
 		return (-1, -1);
 	  }
 static void Power()
@@ -537,10 +546,10 @@ switch(ability){
 	BlowUp();	
 	break;
 	case 2:
-
+	block = 1;
 	break;
 	case 3:
-	
+	Stunin();
 	break;
 		}
 }
@@ -551,13 +560,31 @@ Utok(x - 1, y);
 Utok(x, y + 1);
 Utok(x, y - 1);
 			}
+static void Stunin(){
+foreach (var m in monsters){
+m.Stoned = 3;
+			}
+		     }
+
+static void GetIn(int utok, bool weak){
+if (block == 0){
+if (!weak){
+zivot -= utok;
+	   }
+else{
+zivot = zivot - (int)(Math.Round(utok * 0.5));
+    }
+	    }
+else{
+block --;
+    }
+		     }
 
 
 static void Compli()
 {
         Console.Clear();   
         map = new char[maple][];
-        bool esc = false;
         int kamen = 8;
         Mapa();
 	x = 4;
@@ -567,12 +594,11 @@ static void Compli()
 	Player();
 	MapPrint();
 	ZUkaz();
-        Read(esc);
+        Read();
         if (konec && monSl > 1 && monSl < 5){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátele");}
-        else if (konec && monSl >= 5){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátel");}
-	else if (konec && monSl <= 1){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřítele");}
-	if (LevelUp()) {Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
+        else if (konec && (monSl >= 5 ||  monSl == 0)){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátel");}
+	else if (konec && monSl == 1){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřítele");}
+	if (LevelUp()) {lvl ++; Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
 }
-
 
 }
