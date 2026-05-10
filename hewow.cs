@@ -17,10 +17,12 @@ public static int stoner = 1;
 public static int ability;
 public static int block = 0;
 public static int charge = 0;
+public static int rooms = 10;
 public static double modifi = 1;
 public static bool weagiver = false;
 public static bool konec = false;
 public static bool esc = false;
+public static bool infinity = false;
 public static List<Monsters> monsters = new List<Monsters>();
 
 
@@ -28,9 +30,18 @@ static void Main()
     {
 	Console.Clear();
 	AskRole();
-	for (int i = 0; i < 3; i++){
+	if (infinity){	
+	while (true){
+
+	Compli();
+	if (esc) {break;}
+    			}
+			}
+	else{
+	for (int i = 0; i < rooms; i++){
 	Compli();	
 	if (konec || esc){break;}
+	}
 	}
 	}
 			
@@ -187,8 +198,8 @@ public int Posy;
 public int Stoned;
 public bool Weaknes;
 public Monsters(int zivot, int utok, char skin, int posx, int posy){
-Zivot = zivot;
-Utok = utok;
+Zivot = (int)Math.Round(zivot * modifi);
+Utok = (int)Math.Round(utok * modifi);
 Skin = skin;
 Posx = posx;
 Posy = posy;
@@ -213,7 +224,7 @@ public int Velikost;
 public Slime(int zivot, int velikost, int posx, int posy) : base(zivot, velikost, 'S', posx, posy)
 	{
 
-Velikost = velikost;
+Velikost = (int)Math.Round(velikost * modifi);
 Utok = (int)Math.Round(velikost * modifi);
 Skin = 'S';
 	}
@@ -333,20 +344,20 @@ else{
 	
 }
 static void MonsterCreate(int poc){
-for (int i = 0; i < poc; i++)
+for (int i = 0; i < poc + (int)Math.Round(modifi * 2); i++)
  {
    var (posx, posy) = Moncontr();
    var rngNum1 = RandomNumberGenerator.GetInt32(3);
    if (posx == -1){break;}
     switch(rngNum1){
 		case 0:
-			monsters.Add(new Goblin((int)Math.Round(2 * modifi), (int)Math.Round(2 * modifi), posx, posy));
+			monsters.Add(new Goblin(2, 2, posx, posy));
 			break;
-		case 1:
-                        monsters.Add(new Zombie((int)Math.Round(3 * modifi), (int)Math.Round(1 * modifi), posx, posy));
+		case 1 :
+                        monsters.Add(new Zombie(3, 1, posx, posy));
                         break;
 		case 2:
-			monsters.Add(new Slime((int)Math.Round(6 * modifi), 2, posx, posy));
+			monsters.Add(new Slime(6, 2, posx, posy));
 			break;
 	   	   }
  }
@@ -599,6 +610,7 @@ static void Compli()
         else if (konec && (monSl >= 5 ||  monSl == 0)){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřátel");}
 	else if (konec && monSl == 1){Console.Clear(); Console.WriteLine("Zemřel jsi."); Console.WriteLine($"Zabil jsi {monSl} nepřítele");}
 	if (LevelUp()) {lvl ++; Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
+	modifi += 0.2;
 }
 
 }
