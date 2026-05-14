@@ -136,14 +136,17 @@ break;
 
     static void MapPrint()
     {
+
 	Renderock();
 	MonsteRender();
         for (int i = 0; i < maple; i++)
         {
             for (int j = 0; j < maple; j++)
             {
+		Colorful(map[i][j]);
                 Console.Write(map[i][j] + " ");
-            }
+            	Console.ResetColor();
+		}
             Console.WriteLine();
       }
     }
@@ -591,6 +594,29 @@ block --;
     }
 		     }
 
+static void Colorful (char l){
+l = char.ToLower(l);
+switch (l){
+	case 'r':
+	Console.ForegroundColor = ConsoleColor.Gray;
+	break;
+	case 'g':
+	Console.ForegroundColor = ConsoleColor.Green;
+	break;
+	case 's':
+	Console.ForegroundColor = ConsoleColor.Magenta;
+	break;
+	case 'z':
+	Console.ForegroundColor = ConsoleColor.DarkBlue;
+	break;
+	case 'p':
+	if (block == 1) {Console.ForegroundColor = ConsoleColor.Cyan;}
+	else {Console.ForegroundColor = ConsoleColor.DarkYellow;}
+	break;
+			}
+		     }
+
+
 
 static void Compli()
 {
@@ -612,5 +638,4 @@ static void Compli()
 	if (LevelUp()) {lvl ++; Console.Clear();Console.WriteLine("Gratuluji, porazil jsi vsechny monstra, a vzal jsi si princeznu nebo tak něco");}
 	modifi += 0.2;
 }
-
 }
